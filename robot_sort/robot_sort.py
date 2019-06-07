@@ -81,30 +81,99 @@ class SortingRobot:
         Turn on the robot's light
         """
         self._light = "ON"
+
     def set_light_off(self):
         """
         Turn off the robot's light
         """
         self._light = "OFF"
+
     def light_is_on(self):
         """
         Returns True if the robot's light is on and False otherwise.
         """
         return self._light == "ON"
 
+    def move_up_list(self):
+        while self.can_move_right():
+            # Drop Current Item. Grab item in front of us.
+            self.swap_item()
+            self.move_right()
+            if self.compare_item() == 1:
+                # Item holding was greater. Need to swap with current item and to left.
+                self.swap_item()
+                self.move_left()
+                self.swap_item()
+                self.move_right()
+                # Swap -> Take new item left -> swap -> take item right
+                # Turn light on to indicate we swapped
+                self.set_light_on()
+            else:
+                # Current item is either less than or equal to item in front of us.
+                # Put the lesser item to the left and take the new item.
+                self.move_left()
+                self.swap_item()
+                self.move_right()
+
+    def move_down_list(self):
+        while self.can_move_left():
+            # Drop Current Item. Grab item in front of us.
+            self.swap_item()
+            self.move_left()
+            if self.compare_item() == -1:
+                # Item holding was less. Need to swap with current item and to right.
+                self.swap_item()
+                self.move_right()
+                self.swap_item()
+                self.move_left()
+                self.set_light_on()
+            else:
+                self.move_right()
+                self.swap_item()
+                self.move_left()
+
+    def sort_initial(self):
+        # Runtime on this is horrendous. Fails first time test. Attempting stretch.
+        while self.can_move_right():
+            # On final position, can move right will change after we move up list for last step.
+            # Once that happens, run can move right again, and put a loop inside to go left.
+            self.move_up_list()
+            if not self.can_move_right():
+                # This means we reached end of list. We need to make sure to turn the light off so that no swaps are present.
+                self.set_light_off()
+                self.move_down_list()
+
+                # If light is on, there is still some swapping happening. Loop again.
+                if self.light_is_on():
+                    self.set_light_off()
+                # Otherwise, return from loop.
+                else:
+                    return
+
     def sort(self):
-        """
-        Sort the robot's list.
-        """
-        # Fill this out
-        pass
+        # Need to improve timing, making too many passes.
+        # Selection sort concept. One wrapper loop with two inner loops.
+        while self.can_move_right():
+            self.swap_item()
+            while self.can_move_right():
+                self.move_right()
+
+                if self.compare_item() == 1:
+                    self.swap_item()
+
+            while self.compare_item() != None:
+                self.move_left()
+
+            self.swap_item()
+            self.move_right()
 
 
 if __name__ == "__main__":
     # Test our your implementation from the command line
     # with `python robot_sort.py`
 
-    l = [15, 41, 58, 49, 26, 4, 28, 8, 61, 60, 65, 21, 78, 14, 35, 90, 54, 5, 0, 87, 82, 96, 43, 92, 62, 97, 69, 94, 99, 93, 76, 47, 2, 88, 51, 40, 95, 6, 23, 81, 30, 19, 25, 91, 18, 68, 71, 9, 66, 1, 45, 33, 3, 72, 16, 85, 27, 59, 64, 39, 32, 24, 38, 84, 44, 80, 11, 73, 42, 20, 10, 29, 22, 98, 17, 48, 52, 67, 53, 74, 77, 37, 63, 31, 7, 75, 36, 89, 70, 34, 79, 83, 13, 57, 86, 12, 56, 50, 55, 46]
+    l = [15, 41, 58, 49, 26, 4, 28, 8, 61, 60, 65, 21, 78, 14, 35, 90, 54, 5, 0, 87, 82, 96, 43, 92, 62, 97, 69, 94, 99, 93, 76, 47, 2, 88, 51, 40, 95, 6, 23, 81, 30, 19, 25, 91, 18, 68, 71, 9, 66, 1,
+         45, 33, 3, 72, 16, 85, 27, 59, 64, 39, 32, 24, 38, 84, 44, 80, 11, 73, 42, 20, 10, 29, 22, 98, 17, 48, 52, 67, 53, 74, 77, 37, 63, 31, 7, 75, 36, 89, 70, 34, 79, 83, 13, 57, 86, 12, 56, 50, 55, 46]
 
     robot = SortingRobot(l)
 
